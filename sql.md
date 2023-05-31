@@ -23,10 +23,20 @@ where id NOT IN
 
 ## if条件式 like
 
-```
+```sql
 select employee_id,if(employee_id%2=1 and name not like 'M%',salary,0 ) as bonus
 from Employees
 ```
+
+
+
+```sql
+select stock_name,sum(if(operation='Sell',price,-price)) as capital_gain_loss
+from Stocks
+group by stock_name
+```
+
+
 
 ## case
 
@@ -111,7 +121,7 @@ where employee_id not in (select employee_id from Employees)
 order by employee_id
 ```
 
-### max()
+max()
 
 ```sql
 select max(salary) as SecondHighestSalary
@@ -174,7 +184,7 @@ and datediff(w1.recordDate,w2.recordDate)=1
 SELECT DATEDIFF('2008-11-30','2008-11-29') AS DiffDate
 ```
 
-### with e as ()  order by
+## with e as ()  order by
 
 ```sql
 with e as (select customer_number,count(order_number) as count
@@ -187,3 +197,72 @@ order by e.count desc
 limit 1
 ```
 
+## min(date) max(date)
+
+```sql
+# Write your MySQL query statement below
+select player_id,min(event_date) as first_login
+from Activity
+group by player_id
+
+
+```
+
+```sql
+select user_id,max(time_stamp) as last_stamp
+from Logins
+where time_stamp>='2020-01-01 00:00:00' and time_stamp<'2021-01-01 00:00:00'
+group by user_id
+```
+
+## sum
+
+```
+select event_day as day,emp_id,sum(out_time-in_time) as total_time
+from Employees
+group by event_day,emp_id
+```
+
+```sql
+select u.name,sum(if(r.distance is not null,r.distance,'0')) as travelled_distance
+from Users u left join Rides r on u.id=r.user_id
+group by u.id
+order by travelled_distance desc,u.name
+```
+
+### YEAR(2019)
+
+```sql
+select u.user_id as buyer_id,u.join_date,count(o.order_id) as orders_in_2019
+from Users u left join Orders o on u.user_id=o.buyer_id
+and YEAR(order_date)='2019'
+group by u.user_id
+```
+
+## Having
+
+```sql
+select actor_id,director_id from ActorDirector group by actor_id,director_id having count(*)>=3;
+```
+
+The `HAVING` clause is used in SQL queries to filter the result set based on conditions that involve aggregated values. It is similar to the `WHERE` clause, but while the `WHERE` clause filters individual rows before grouping and aggregating, the `HAVING` clause filters groups after grouping and aggregating.
+
+```sql
+# Write your MySQL query statement below
+select u.name,sum(t.amount) as balance
+from Users u join Transactions t on
+u.account=t.account
+group by u.account
+having balance>'10000'
+```
+
+## inner join
+
+```sql
+select product_id,product_name from Sales
+inner join product using(product_id)  
+group by product_id
+having sum(if(sale_date between '2019-01-01' and '2019-03-31', 1, 0)) = sum(if(sale_date, 1, 0))
+```
+
+## DATE_TRUNC('datepart',timestamp)
